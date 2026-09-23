@@ -163,6 +163,14 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["access-control-allow-origin"], "http://localhost:5500")
 
+    def test_frontend_and_docs_are_served(self):
+        home = self.client.get("/")
+        self.assertEqual(home.status_code, 200)
+        self.assertIn('src="app.js"', home.text)
+        self.assertEqual(self.client.get("/cart.html").status_code, 200)
+        self.assertEqual(self.client.get("/docs").status_code, 200)
+        self.assertEqual(self.client.get("/openapi.json").status_code, 200)
+
     def test_concurrent_confirmation(self):
         action = self.proposal().json()["id"]
 
