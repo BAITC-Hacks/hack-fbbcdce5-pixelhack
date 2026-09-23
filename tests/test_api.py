@@ -6,11 +6,13 @@ from unittest.mock import patch
 
 import httpx
 from fastapi.testclient import TestClient
+from pydantic import HttpUrl
 
 from app.core.config import Settings
 from app.core.errors import AppError
 from app.integrations.ekt import EktClient, normalize_product
 from app.main import create_app
+from app.schemas import PurchaseTerms
 
 
 class ApiTests(unittest.TestCase):
@@ -96,6 +98,59 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.json()["cart"]["items"], [])
         self.assertEqual(len(self.app.state.sessions.sessions[self.sid].history), 4)
 
+    def chat(self, message):
+        response = self.client.post(self.base + "/chat", headers=self.auth, json={"message": message})
+        self.assertEqual(response.status_code, 200, response.text)
+        body = response.json()
+        self.assertEqual(set(body), {"message", "products", "alternatives", "pending_action", "cart", "assistant_mode"})
+        return body
+
+    def test_assistant_product_facts_and_context(self):
+        product = self.app.state.catalog.demo["demo-1"]
+        product.certificates = [HttpUrl("https://example.org/certificate.pdf")]
+        first = self.chat("Есть DEMO-C16?")
+        self.assertEqual(first["products"][0]["id"], "demo-1")
+        self.assertIn("1500.00 KZT", first["message"])
+        self.assertIn("NOMINALNYY_TOK: 16А", first["message"])
+        self.assertIn("https://example.org/certificate.pdf", first["message"])
+        followup = self.chat("а сертификат?")
+        self.assertEqual(followup["products"][0]["id"], "demo-1")
+        self.assertIn("certificate.pdf", followup["message"])
+        self.assertIn("10", self.chat("сколько осталось?")["message"])
+        unknown = self.chat("Есть артикул UNKNOWN-404?")
+        self.assertEqual(unknown["products"], [])
+        self.assertIn("не найдена", unknown["message"])
+
+    def test_assistant_zero_stock_and_analog(self):
+        response = self.chat("Есть DEMO-C16-OLD?")
+        self.assertEqual(response["products"][0]["id"], "demo-2")
+        self.assertEqual(response["alternatives"][0]["product"]["id"], "demo-1")
+        self.assertIn("Совпадают", response["message"])
+
+    def test_assistant_unknown_stock_and_terms(self):
+        self.app.state.catalog.demo["demo-1"].quantity = None
+        response = self.chat("Есть DEMO-C16?")
+        self.assertIn("Остаток: неизвестен", response["message"])
+        self.assertEqual(response["alternatives"], [])
+        with patch.object(self.app.state.catalog, "terms", return_value=PurchaseTerms(
+            payment="Условия оплаты неизвестны.", delivery="Условия доставки неизвестны.",
+            minimum_order="Минимальная партия неизвестна.", source="unavailable")):
+            terms = self.chat("Какие условия оплаты и доставки?")
+        self.assertIn("Условия оплаты неизвестны", terms["message"])
+        self.assertIn("Минимальная партия неизвестна", terms["message"])
+
+    def test_assistant_ambiguous_request_and_pending_only(self):
+        ambiguous = self.chat("Есть автомат C16?")
+        self.assertIn("Уточните артикул", ambiguous["message"])
+        self.assertIsNone(ambiguous["pending_action"])
+        self.chat("Покажи DEMO-C16")
+        proposal = self.chat("добавь две штуки этого")
+        self.assertEqual(proposal["pending_action"]["quantity"], "2")
+        self.assertEqual(proposal["cart"]["items"], [])
+        consent = self.chat("да, добавь")
+        self.assertEqual(consent["cart"]["items"], [])
+        self.assertEqual(consent["pending_action"]["id"], proposal["pending_action"]["id"])
+
     def test_errors_and_cors(self):
         response = self.client.post(self.base + "/chat", headers=self.auth, json={"message": "  "})
         self.assertEqual(response.status_code, 422)
@@ -128,6 +183,10 @@ class ApiTests(unittest.TestCase):
             self.assertFalse(agent.model_settings.store)
             tools = {tool.name: tool for tool in agent.tools}
             self.assertNotIn("confirm", tools)
+            context = ToolContext(context=None, tool_name="search_products", tool_call_id="search", tool_arguments='{}')
+            summary = await tools["search_products"].on_invoke_tool(context, '{"query":"DEMO-C16"}')
+            self.assertNotIn('"price"', summary)
+            self.assertNotIn('"quantity"', summary)
             context = ToolContext(context=None, tool_name="product_details", tool_call_id="test", tool_arguments='{}')
             result = await tools["product_details"].on_invoke_tool(context, '{"product_id":"demo-1"}')
             self.assertIn("DEMO-C16", result)
