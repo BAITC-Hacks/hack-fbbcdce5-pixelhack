@@ -1,4 +1,5 @@
 import asyncio
+import os
 import unittest
 from datetime import timedelta
 from decimal import Decimal
@@ -11,8 +12,11 @@ from pydantic import HttpUrl
 from app.core.config import Settings
 from app.core.errors import AppError
 from app.integrations.ekt import EktClient, normalize_product
-from app.main import create_app
 from app.schemas import PurchaseTerms
+from app.services.catalog import CatalogService
+
+with patch.dict(os.environ, {"CATALOG_MODE": "demo", "ASSISTANT_MODE": "demo"}):
+    from app.main import create_app
 
 
 class ApiTests(unittest.TestCase):
@@ -183,7 +187,7 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(chat.status_code, 200)
         self.assertIn('id="back-button"', chat.text)
         self.assertIn('class="product-image"', chat.text)
-        self.assertIn('DEMO-DRILL18', chat.text)
+        self.assertIn('515291', chat.text)
         self.assertIn('placeholder="Например: покажи шуруповёрт"', chat.text)
         self.assertEqual(self.client.get("/chat-navigation.js").status_code, 200)
         cart = self.client.get("/cart.html")
@@ -281,6 +285,21 @@ class ApiTests(unittest.TestCase):
 
 
 class AdapterTests(unittest.IsolatedAsyncioTestCase):
+    async def test_numeric_search_reads_exact_product(self):
+        requests = []
+
+        def response(request):
+            requests.append(request.url.path)
+            return httpx.Response(200, json={"id": 515291, "article": "200300285_",
+                                              "name": "Legrand", "price": 64920, "quantity": 23})
+
+        async with httpx.AsyncClient(base_url="https://ekt.kz", transport=httpx.MockTransport(response)) as client:
+            catalog = CatalogService(EktClient(client), search_pages=5)
+            result = await catalog.list(1, "515291")
+            self.assertEqual([item.id for item in result.items], ["515291"])
+            self.assertEqual(result.search_scope, "exact_id")
+            self.assertEqual(requests, ["/api/products/detail"])
+
     async def test_real_contract_and_unknown_stock(self):
         source = {"id": 515291, "article": "200300285_", "name": "Legrand", "price": 64920,
                   "properties": {"KRATNOST_MIN": "1"}}
