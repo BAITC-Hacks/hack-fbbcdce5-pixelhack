@@ -60,7 +60,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     await openai_client.close()
 
     app = FastAPI(title="EKT AI Assistant API", version="0.1.0", lifespan=lifespan,
-                  description="API прототипа HackAlem AI. Синтетический каталог по умолчанию; корзина локальная.")
+                  description="API прототипа HackAlem AI. Каталог EKT и ответы ИИ; корзина локальная.")
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins,
                        allow_methods=["GET", "POST", "DELETE"],
                        allow_headers=["Authorization", "Content-Type"])
