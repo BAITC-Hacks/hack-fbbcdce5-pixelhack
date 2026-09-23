@@ -6,7 +6,7 @@ import httpx
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException
 
@@ -99,8 +99,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         logger.error("Request failed: %s", type(exc).__name__)
         return error(502, "service_unavailable", "Сервис временно недоступен. Попробуйте позже.")
 
-    app.include_router(router)
     frontend_dir = Path(__file__).resolve().parent.parent / "front"
+
+    @app.get("/", include_in_schema=False)
+    async def storefront():
+        return FileResponse(frontend_dir / "home.html")
+
+    app.include_router(router)
     app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
     return app
 
