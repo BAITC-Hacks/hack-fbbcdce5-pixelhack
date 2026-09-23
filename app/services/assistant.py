@@ -135,6 +135,18 @@ class AssistantService:
         products = {}
         alternatives = []
 
+        async def resolve_product(identifier: str):
+            try:
+                return await self.catalog.detail(identifier)
+            except AppError as exc:
+                if exc.status != 404:
+                    raise
+            result = await self.catalog.list(1, identifier)
+            matches = [item for item in result.items if item.article.casefold() == identifier.casefold()]
+            if len(matches) != 1:
+                raise AppError(404, "product_not_found", "Точный артикул не найден в просмотренной части каталога.")
+            return await self.catalog.detail(matches[0].id)
+
         @function_tool(failure_error_function=None)
         async def search_products(query: str) -> str:
             """Search by article or short product keywords. Returns IDs, not current price or stock."""
@@ -145,15 +157,16 @@ class AssistantService:
 
         @function_tool(failure_error_function=None)
         async def product_details(product_id: str) -> str:
-            """Get fresh stock, price, properties, description and available certificates by ID."""
-            product = await self.catalog.detail(product_id)
+            """Get fresh stock, price, properties and certificates by product ID or exact article."""
+            product = await resolve_product(product_id)
             products[product.id] = product
             return product.model_dump_json()
 
         @function_tool(failure_error_function=None)
         async def find_alternatives(product_id: str) -> str:
-            """Find alternatives with verified matching attributes and reasons."""
-            result = await self.catalog.alternatives(product_id)
+            """Find alternatives by product ID or exact article with verified matching attributes."""
+            product = await resolve_product(product_id)
+            result = await self.catalog.alternatives(product.id)
             alternatives.extend(result.items)
             return result.model_dump_json()
 
@@ -164,8 +177,9 @@ class AssistantService:
 
         @function_tool(failure_error_function=None)
         async def propose_cart_addition(product_id: str, quantity: str) -> str:
-            """Prepare a cart addition with explicit quantity. Does NOT modify the cart."""
-            proposal = await self.cart.propose(session, CartProposal(product_id=product_id, quantity=quantity))
+            """Prepare a cart addition by product ID or exact article and explicit quantity. Does NOT modify the cart."""
+            product = await resolve_product(product_id)
+            proposal = await self.cart.propose(session, CartProposal(product_id=product.id, quantity=quantity))
             products[proposal.product.id] = proposal.product
             return proposal.model_dump_json()
 
@@ -176,6 +190,8 @@ class AssistantService:
                 "Данные товаров получай только через инструменты; не выдумывай цены, наличие, ссылки, "
                 "сертификаты или условия. Перед ответом о цене и наличии вызывай product_details. "
                 "Для найденной позиции вызови product_details также перед сообщением характеристик или сертификатов. "
+                "Пустой список certificates означает, что ссылки в карточке не указаны; это не доказательство "
+                "отсутствия сертификатов у товара. "
                 "Не считай неизвестный остаток нулевым. При нулевом остатке вызывай find_alternatives; "
                 "объясни совпадения, при отсутствии аналогов честно скажи об этом. "
                 "Поиск ограничен первыми страницами: отсутствие результата не означает отсутствие товара во всём каталоге. "
