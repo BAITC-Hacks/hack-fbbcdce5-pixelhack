@@ -36,7 +36,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         ) as http:
             openai_client = None
             if settings.assistant_mode == "openai":
-                from openai import AsyncOpenAI
+                # Lazy import: demo mode must start without the AI SDK installed.
+                try:
+                    from openai import AsyncOpenAI
+                except ImportError as exc:
+                    raise RuntimeError(
+                        "ASSISTANT_MODE=openai requires the 'openai' package. Install the project "
+                        "dependencies (pip install -r requirements.txt) into the interpreter that runs the app."
+                    ) from exc
                 openai_client = AsyncOpenAI(api_key=settings.openai_api_key.get_secret_value(),
                                             timeout=settings.chat_timeout_seconds, max_retries=0)
             app.state.settings = settings
