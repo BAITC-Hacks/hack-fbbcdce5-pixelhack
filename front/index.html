@@ -43,7 +43,7 @@
 
           <div id="attachment-preview" class="attachment-preview" hidden></div>
           <form id="chat-form" class="composer">
-            <input id="file-input" type="file" hidden accept=".xlsx,.xls,.doc,.docx,.pdf,.jpg,.jpeg" />
+            <input id="file-input" type="file" hidden accept=".xlsx,.docx,.pdf,.jpg,.jpeg" />
             <label class="icon-button" for="file-input" title="Прикрепить файл">
               <span aria-hidden="true">+</span><span class="sr-only">Прикрепить файл</span>
             </label>
@@ -64,6 +64,10 @@
         <dl class="specs"></dl>
         <a class="certificate" target="_blank" rel="noopener" hidden>Открыть сертификат</a>
         <p class="analog-reason" hidden></p>
+        <div class="manual-proposal">
+          <label>Количество <input class="quantity-input" type="number" min="0.001" step="any" value="1" inputmode="decimal" /></label>
+          <button class="prepare-button" type="button">Подготовить добавление</button>
+        </div>
       </article>
     </template>
     <script src="app.js"></script>

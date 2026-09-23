@@ -1,11 +1,13 @@
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 import httpx
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException
 
 from app.api.routes import router
@@ -91,6 +93,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return error(502, "service_unavailable", "Сервис временно недоступен. Попробуйте позже.")
 
     app.include_router(router)
+    frontend_dir = Path(__file__).resolve().parent.parent / "front"
+    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
     return app
 
 
