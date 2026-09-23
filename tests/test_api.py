@@ -196,10 +196,13 @@ class ApiTests(unittest.TestCase):
             self.assertNotIn('"price"', summary)
             self.assertNotIn('"quantity"', summary)
             context = ToolContext(context=None, tool_name="product_details", tool_call_id="test", tool_arguments='{}')
-            result = await tools["product_details"].on_invoke_tool(context, '{"product_id":"demo-1"}')
+            result = await tools["product_details"].on_invoke_tool(context, '{"product_id":"DEMO-C16"}')
+            self.assertIn("DEMO-C16", result)
+            context = ToolContext(context=None, tool_name="find_alternatives", tool_call_id="alternative", tool_arguments='{}')
+            result = await tools["find_alternatives"].on_invoke_tool(context, '{"product_id":"DEMO-C16-OLD"}')
             self.assertIn("DEMO-C16", result)
             context = ToolContext(context=None, tool_name="propose_cart_addition", tool_call_id="test2", tool_arguments='{}')
-            await tools["propose_cart_addition"].on_invoke_tool(context, '{"product_id":"demo-1","quantity":"2"}')
+            await tools["propose_cart_addition"].on_invoke_tool(context, '{"product_id":"DEMO-C16","quantity":"2"}')
             return SimpleNamespace(final_output="Нужно подтверждение.")
 
         service = self.app.state.assistant
