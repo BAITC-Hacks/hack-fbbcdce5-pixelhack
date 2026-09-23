@@ -20,6 +20,9 @@
     node.querySelector(".store-product-article").textContent = `Артикул: ${product.article}`;
     const stock = node.querySelector(".store-product-stock"); stock.textContent = stockLabel(product); if (product.quantity !== null && Number(product.quantity) <= 0) stock.classList.add("is-empty");
     node.querySelector(".store-product-price").textContent = product.price == null ? "Цена уточняется" : `${product.price} ${product.currency}`;
+    node.querySelector(".card-ai-link").addEventListener("click", () => {
+      sessionStorage.setItem("ekt-ai-prefill", product.name);
+    });
     return node;
   }
   async function loadProducts(query = "") {
@@ -37,4 +40,3 @@
   document.querySelector("#reload-products").addEventListener("click", () => loadProducts(searchInput.value.trim()));
   loadProducts();
 })();
-//gggjghjkjlgjdgdfh

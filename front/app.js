@@ -73,4 +73,12 @@
   }
   async function init() { try { await ensureSession(); const health = await request("/health"); let cart; try { cart = await request(`/sessions/${session.session_id}/cart`, { headers: authHeaders() }); } catch (error) { if (session) throw error; await ensureSession(); cart = await request(`/sessions/${session.session_id}/cart`, { headers: authHeaders() }); } setCart(cart); const demo = health.assistant_mode === "demo"; setStatus(demo ? "Демо-режим" : "Подключено", demo ? "demo" : "online"); elements.file.disabled = demo; document.querySelector(".composer-note").textContent = demo ? "Вложения доступны в режиме OpenAI. Не указывайте платёжные данные." : "Файлы: Excel, Word, PDF, JPEG. Не указывайте платёжные данные."; if (health.catalog_mode === "live") { const examples = document.querySelectorAll(".suggestion"); examples[0].textContent = "Покажи товар с ID 515291"; examples[1].textContent = "Какие характеристики у товара 515291?"; elements.input.placeholder = "Например: покажи товар с ID 515291"; } } catch (error) { clearSession(); setStatus("Сервис недоступен"); addMessage(error.message); } }
   elements.form.addEventListener("submit", submit); elements.file.addEventListener("change", () => { const file = elements.file.files[0]; elements.preview.hidden = !file; elements.preview.textContent = file ? `Выбран файл: ${file.name}` : ""; }); document.querySelectorAll(".suggestion").forEach((button) => button.addEventListener("click", () => { elements.input.value = button.textContent; elements.input.focus(); })); init();
+  try {
+    const productName = sessionStorage.getItem("ekt-ai-prefill");
+    if (productName) {
+      sessionStorage.removeItem("ekt-ai-prefill");
+      elements.input.value = productName;
+      elements.input.focus();
+    }
+  } catch { /* Session storage is optional; the chat remains usable without it. */ }
 })();
