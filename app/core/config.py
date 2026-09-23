@@ -1,11 +1,15 @@
 from typing import Literal
+from pathlib import Path
 
 from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    _repo_root = Path(__file__).resolve().parents[2]
+    model_config = SettingsConfigDict(
+        env_file=(_repo_root.parent / ".env", _repo_root / ".env"),
+        env_file_encoding="utf-8", extra="ignore")
 
     catalog_mode: Literal["demo", "live"] = "demo"
     assistant_mode: Literal["demo", "openai"] = "demo"
