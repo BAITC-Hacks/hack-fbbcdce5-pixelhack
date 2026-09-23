@@ -34,7 +34,7 @@ class Product(BaseModel):
     certificates: list[HttpUrl] = Field(default_factory=list)
     url: HttpUrl | None = None
     image: str | None = None
-    source: Literal["demo", "ekt"]
+    source: Literal["ekt"]
     fetched_at: datetime
 
     @field_validator("image")
@@ -75,7 +75,7 @@ class PurchaseTerms(BaseModel):
     payment: str
     delivery: str
     minimum_order: str
-    source: Literal["demo", "unavailable"]
+    source: Literal["unavailable"]
 
 
 class SessionCreated(BaseModel):
@@ -128,4 +128,3 @@ class ChatResponse(BaseModel):
     alternatives: list[Alternative] = Field(default_factory=list)
     pending_action: PendingAction | None = None
     cart: Cart
-    assistant_mode: Literal["demo", "openai"]
