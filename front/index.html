@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b4a78" />
+    <title>Электрокомплект — помощник по каталогу</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Электрокомплект">
+          <span class="brand-mark" aria-hidden="true">E</span>
+          <span>Электрокомплект</span>
+        </a>
+        <div class="topbar-actions">
+          <span id="connection-status" class="status" aria-live="polite">Проверяем подключение</span>
+          <a class="cart-link" href="cart.html">Корзина <span id="cart-count" class="badge">0</span></a>
+        </div>
+      </header>
+
+      <section class="chat-layout" aria-label="Чат с помощником">
+        <aside class="sidebar">
+          <p class="eyebrow">Онлайн-консультант</p>
+          <h1>Подберу электротехнический товар</h1>
+          <p>Проверю характеристики, наличие, сертификаты и найду аналог, если позиции нет.</p>
+          <div class="tips" aria-label="Примеры запросов">
+            <button class="suggestion" type="button">Есть ли товар с артикулом EK-515291?</button>
+            <button class="suggestion" type="button">Покажи кабель с похожими характеристиками</button>
+            <button class="suggestion" type="button">Какие условия доставки и оплаты?</button>
+          </div>
+          <p class="sidebar-note">Товар попадёт в корзину только после вашего явного подтверждения.</p>
+        </aside>
+
+        <div class="chat-panel">
+          <div id="messages" class="messages" role="log" aria-live="polite" aria-label="Сообщения чата">
+            <article class="message assistant-message">
+              <div class="avatar" aria-hidden="true">AI</div>
+              <div class="bubble">Здравствуйте! Напишите артикул, название товара или вопрос об условиях покупки.</div>
+            </article>
+          </div>
+
+          <div id="attachment-preview" class="attachment-preview" hidden></div>
+          <form id="chat-form" class="composer">
+            <input id="file-input" type="file" hidden accept=".xlsx,.xls,.doc,.docx,.pdf,.jpg,.jpeg" />
+            <label class="icon-button" for="file-input" title="Прикрепить файл">
+              <span aria-hidden="true">+</span><span class="sr-only">Прикрепить файл</span>
+            </label>
+            <label class="sr-only" for="chat-input">Ваше сообщение</label>
+            <textarea id="chat-input" rows="1" maxlength="2000" placeholder="Например: нужен автомат на 16 А"></textarea>
+            <button id="send-button" class="send-button" type="submit">Отправить</button>
+          </form>
+          <p class="composer-note">Файлы: Excel, Word, PDF, JPEG. Не указывайте платёжные данные.</p>
+        </div>
+      </section>
+    </main>
+    <template id="product-template">
+      <article class="product-card">
+        <div class="product-card-head"><p class="product-category"></p><span class="stock"></span></div>
+        <h2 class="product-name"></h2>
+        <p class="article"></p>
+        <p class="price"></p>
+        <dl class="specs"></dl>
+        <a class="certificate" target="_blank" rel="noopener" hidden>Открыть сертификат</a>
+        <p class="analog-reason" hidden></p>
+      </article>
+    </template>
+    <script src="app.js"></script>
+  </body>
+</html>
