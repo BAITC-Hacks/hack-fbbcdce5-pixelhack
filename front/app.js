@@ -7,6 +7,7 @@
   };
   let session;
   let proposalSection;
+
   let proposalId;
   function readSession() { try { return JSON.parse(sessionStorage.getItem(sessionKey)); } catch { return null; } }
   function saveSession(value) { session = value; sessionStorage.setItem(sessionKey, JSON.stringify(value)); }
