@@ -1,0 +1,33 @@
+# Виртуальное окружение
+.venv/
+venv/
+ENV/
+env/
+
+# Кэш Python и компилированные файлы
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Файлы настроек VS Code и PyCharm
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Секретные данные и переменные окружения
+.env
+*.local
+.secret
+credentials.json
+
+# Логи и операционная система
+*.log
+.DS_Store
+Thumbs.db
