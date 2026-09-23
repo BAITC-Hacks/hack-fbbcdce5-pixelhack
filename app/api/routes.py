@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Path, Query, Request, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -32,16 +32,17 @@ AuthorizedSession = Annotated[Session, Depends(authorized_session)]
 @router.get("/health", tags=["system"])
 async def health(request: Request):
     settings = request.app.state.settings
-    return {"status": "ok", "catalog_mode": settings.catalog_mode,
-            "assistant_mode": settings.assistant_mode, "cart_mode": "local"}
+    return {"status": "ok", "catalog_mode": "live",
+            "assistant_mode": "openai", "cart_mode": "local"}
 
 
 @router.get("/products", response_model=ProductPage, tags=["catalog"])
 async def products(request: Request, page: Annotated[int, Query(ge=1, le=100000)] = 1,
-                   q: Annotated[str | None, Query(min_length=1, max_length=200)] = None):
+                   q: Annotated[str | None, Query(min_length=1, max_length=200)] = None,
+                   sort: Literal["relevance", "price_asc"] = "relevance"):
     if q is not None and not q.strip():
         raise AppError(422, "invalid_query", "Поисковый запрос не может быть пустым.")
-    return await request.app.state.catalog.list(page, q)
+    return await request.app.state.catalog.list(page, q, sort)
 
 
 @router.get("/products/{product_id}", response_model=Product, tags=["catalog"])
@@ -81,10 +82,8 @@ async def chat(request: Request, body: ChatRequest, session: AuthorizedSession):
 async def attachment_chat(request: Request, session: AuthorizedSession):
     """Send raw file bytes with their Content-Type; uses previous chat context.
 
-    Files are not persisted. This endpoint requires ASSISTANT_MODE=openai.
+    Files are not persisted.
     """
-    if request.app.state.settings.assistant_mode != "openai":
-        raise AppError(503, "ai_required", "Для анализа вложений включите ASSISTANT_MODE=openai.")
     media_type = request.headers.get("content-type", "").split(";", 1)[0].lower()
     if media_type not in SUPPORTED_TYPES:
         raise AppError(415, "unsupported_attachment", "Поддерживаются PDF, JPEG, DOCX и XLSX.")

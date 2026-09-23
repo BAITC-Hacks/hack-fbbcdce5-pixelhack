@@ -16,13 +16,13 @@ def archive(files):
 
 class AttachmentTests(unittest.TestCase):
     def test_docx(self):
-        data = archive({"word/document.xml": '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>DEMO-C16</w:t></w:r></w:p></w:body></w:document>'})
-        self.assertIn("DEMO-C16", content_block(data, DOCX)["text"])
+        data = archive({"word/document.xml": '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>ART-101</w:t></w:r></w:p></w:body></w:document>'})
+        self.assertIn("ART-101", content_block(data, DOCX)["text"])
 
     def test_xlsx(self):
-        data = archive({"xl/worksheets/sheet1.xml": '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData><row><c r="A1" t="inlineStr"><is><t>DEMO-C16</t></is></c><c r="B1"><v>2</v></c></row></sheetData></worksheet>'})
+        data = archive({"xl/worksheets/sheet1.xml": '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData><row><c r="A1" t="inlineStr"><is><t>ART-101</t></is></c><c r="B1"><v>2</v></c></row></sheetData></worksheet>'})
         text = content_block(data, XLSX)["text"]
-        self.assertIn("A1: DEMO-C16", text)
+        self.assertIn("A1: ART-101", text)
         self.assertIn("B1: 2", text)
 
     def test_binary_blocks(self):

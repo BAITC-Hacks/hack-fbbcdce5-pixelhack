@@ -34,21 +34,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             limits=httpx.Limits(max_connections=20, max_keepalive_connections=10),
             follow_redirects=False,
         ) as http:
-            openai_client = None
-            if settings.assistant_mode == "openai":
-                # Lazy import: demo mode must start without the AI SDK installed.
-                try:
-                    from openai import AsyncOpenAI
-                except ImportError as exc:
-                    raise RuntimeError(
-                        "ASSISTANT_MODE=openai requires the 'openai' package. Install the project "
-                        "dependencies (pip install -r requirements.txt) into the interpreter that runs the app."
-                    ) from exc
-                openai_client = AsyncOpenAI(api_key=settings.openai_api_key.get_secret_value(),
-                                            timeout=settings.chat_timeout_seconds, max_retries=0)
+            from openai import AsyncOpenAI
+            openai_client = AsyncOpenAI(api_key=settings.openai_api_key.get_secret_value(),
+                                        timeout=settings.chat_timeout_seconds, max_retries=0)
             app.state.settings = settings
-            app.state.catalog = CatalogService(EktClient(http) if settings.catalog_mode == "live" else None,
-                                               settings.ekt_search_pages)
+            app.state.catalog = CatalogService(EktClient(http), settings.ekt_search_pages)
             app.state.sessions = SessionStore(settings.session_ttl_seconds, settings.max_sessions)
             app.state.cart = CartService(app.state.catalog)
             app.state.assistant = AssistantService(settings, app.state.catalog, app.state.cart, openai_client)
@@ -56,8 +46,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 yield
             finally:
                 app.state.sessions.sessions.clear()
-                if openai_client:
-                    await openai_client.close()
+                await openai_client.close()
 
     app = FastAPI(title="EKT AI Assistant API", version="0.1.0", lifespan=lifespan,
                   description="API прототипа HackAlem AI. Каталог EKT и ответы ИИ; корзина локальная.")
