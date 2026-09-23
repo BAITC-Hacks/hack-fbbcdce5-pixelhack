@@ -149,7 +149,7 @@ class AssistantService:
 
         @function_tool(failure_error_function=None)
         async def search_products(query: str) -> str:
-            """Search by article or short product keywords. Returns IDs, not current price or stock."""
+            """Search by product ID, article or short keywords. Numeric IDs use a fresh EKT detail request. Other queries scan a limited number of pages. Call product_details for current facts."""
             result = await self.catalog.list(1, query)
             return json.dumps({"items": [{"id": p.id, "article": p.article, "name": p.name,
                                            "category": p.category} for p in result.items],
@@ -189,6 +189,7 @@ class AssistantService:
                 "Ты консультант магазина ekt.kz. Отвечай на языке пользователя кратко и понятно. "
                 "Данные товаров получай только через инструменты; не выдумывай цены, наличие, ссылки, "
                 "сертификаты или условия. Перед ответом о цене и наличии вызывай product_details. "
+                "Если пользователь указал числовой ID товара, сразу вызови product_details с этим ID. "
                 "Для найденной позиции вызови product_details также перед сообщением характеристик или сертификатов. "
                 "Пустой список certificates означает, что ссылки в карточке не указаны; это не доказательство "
                 "отсутствия сертификатов у товара. "

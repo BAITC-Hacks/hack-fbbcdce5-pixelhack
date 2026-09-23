@@ -38,6 +38,16 @@ class CatalogService:
         if not query:
             products, more = await self._page(page)
             return ProductPage(items=products, page=page, has_more=more, search_scope="page")
+        # EKT product IDs can be resolved without scanning only the first catalog pages.
+        if self.ekt and query.isdecimal():
+            try:
+                product = await self.detail(query)
+            except AppError as exc:
+                if exc.status != 404:
+                    raise
+            else:
+                return ProductPage(items=[product] if page == 1 else [], page=page,
+                                   has_more=False, search_scope="exact_id")
         found = []
         more = False
         for number in range(1, self.search_pages + 1):

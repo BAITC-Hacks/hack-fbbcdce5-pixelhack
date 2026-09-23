@@ -11,8 +11,8 @@ class Settings(BaseSettings):
         env_file=(_repo_root.parent / ".env", _repo_root / ".env"),
         env_file_encoding="utf-8", extra="ignore")
 
-    catalog_mode: Literal["demo", "live"] = "demo"
-    assistant_mode: Literal["demo", "openai"] = "demo"
+    catalog_mode: Literal["demo", "live"] = "live"
+    assistant_mode: Literal["demo", "openai"] = "openai"
     openai_api_key: SecretStr = SecretStr("")
     openai_model: str = "gpt-4.1-mini"
     ekt_base_url: Literal["https://ekt.kz"] = "https://ekt.kz"
