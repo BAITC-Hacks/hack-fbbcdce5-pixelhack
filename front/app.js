@@ -33,6 +33,11 @@
   function stock(product) { if (product.quantity === null) return ["Остаток уточняется", ""]; return Number(product.quantity) > 0 ? [`В наличии: ${product.quantity}`, ""] : ["Нет в наличии", "out"]; }
   function productCard(product, reason = "") {
     const node = elements.template.content.firstElementChild.cloneNode(true); const [stockText, stockClass] = stock(product);
+    const image = node.querySelector(".product-image img"); const placeholder = node.querySelector(".product-image-placeholder");
+    if (product.image) {
+      image.src = product.image; image.alt = product.name; image.hidden = false; placeholder.hidden = true;
+      image.addEventListener("error", () => { image.hidden = true; placeholder.hidden = false; }, { once: true });
+    }
     node.querySelector(".product-category").textContent = product.category || "Категория не указана";
     const stockNode = node.querySelector(".stock"); stockNode.textContent = stockText; if (stockClass) stockNode.classList.add(stockClass);
     node.querySelector(".product-name").textContent = product.name; node.querySelector(".article").textContent = `Артикул: ${product.article}`; node.querySelector(".price").textContent = money(product.price, product.currency);
