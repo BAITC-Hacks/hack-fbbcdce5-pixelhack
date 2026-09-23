@@ -1,0 +1,219 @@
+/* Messenger layout for the two chat entry pages. The storefront and cart keep style.css. */
+.chat-page {
+  --blue: #3390ec;
+  --blue-dark: #2176cc;
+  --ink: #182533;
+  --muted: #72808e;
+  --line: #e6ebef;
+  --canvas: #e8eef3;
+  background: var(--canvas);
+}
+
+.chat-page .app-shell {
+  display: grid;
+  grid-template-rows: 64px minmax(0, 1fr);
+  width: min(100%, 1600px);
+  max-width: none;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  box-shadow: 0 0 35px rgba(33, 57, 77, .1);
+}
+
+.chat-page .topbar {
+  min-height: 0;
+  padding: 0 24px;
+  background: #fff;
+}
+
+.chat-page .brand { color: #243746; font-size: 16px; }
+.chat-page .brand-mark,
+.chat-page .avatar,
+.chat-page .conversation-avatar { background: #3390ec; }
+.chat-page .topbar-actions { min-width: 0; gap: 20px; }
+.chat-page .cart-link { white-space: nowrap; }
+.chat-page .badge { background: #3390ec; }
+
+.chat-page .chat-layout {
+  display: grid;
+  grid-template-columns: clamp(290px, 27vw, 350px) minmax(0, 1fr);
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.chat-page .sidebar {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 30px 20px 22px;
+  overflow-y: auto;
+  background: #fff;
+  border-right: 1px solid var(--line);
+}
+
+.chat-page .eyebrow { margin-bottom: 14px; color: #3390ec; }
+.chat-page .sidebar h1 { margin-bottom: 12px; font-size: 25px; line-height: 1.18; }
+.chat-page .sidebar > p:not(.eyebrow) { line-height: 1.45; font-size: 14px; }
+.chat-page .tips { margin-top: 30px; gap: 8px; }
+.chat-page .suggestion {
+  width: 100%;
+  padding: 12px 14px;
+  border-color: #e3ebf1;
+  border-radius: 12px;
+  background: #f5f8fb;
+  color: #294355;
+  overflow-wrap: anywhere;
+}
+.chat-page .suggestion:hover { background: #e8f3ff; border-color: #a8d3ff; }
+.chat-page .sidebar-note { margin-top: auto !important; padding-top: 18px; border-color: var(--line); }
+
+.chat-page .chat-panel { min-width: 0; min-height: 0; overflow: hidden; }
+.chat-page .conversation-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 64px;
+  min-width: 0;
+  padding: 9px 24px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+}
+.chat-page .conversation-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+.chat-page .conversation-header > div { display: grid; min-width: 0; gap: 2px; }
+.chat-page .conversation-header strong { font-size: 15px; }
+.chat-page .conversation-header span:last-child { color: var(--muted); font-size: 12px; }
+
+.chat-page .messages {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 0;
+  padding: 28px clamp(18px, 4vw, 56px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #e9f0f5;
+  background-image: radial-gradient(#d5e2ea 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.chat-page .message { min-width: 0; margin-bottom: 14px; }
+.chat-page .message .avatar { flex: 0 0 32px; width: 32px; height: 32px; }
+.chat-page .user-message .avatar { display: none; }
+.chat-page .bubble {
+  width: fit-content;
+  max-width: min(78%, 680px);
+  min-width: 0;
+  padding: 11px 14px;
+  border-radius: 6px 16px 16px 16px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(34, 60, 77, .1);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.48;
+}
+.chat-page .user-message .bubble {
+  margin-left: auto;
+  border-radius: 16px 6px 16px 16px;
+  background: #d9f7ce;
+  color: var(--ink);
+}
+
+.chat-page .results,
+.chat-page .proposal {
+  align-self: flex-start;
+  width: min(760px, calc(100% - 43px));
+  min-width: 0;
+  margin: 0 0 18px 43px;
+}
+.chat-page .results { grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); }
+.chat-page .product-card,
+.chat-page .proposal { overflow: hidden; background: #fff; border-color: #e1e9ef; box-shadow: 0 1px 3px rgba(34, 60, 77, .08); }
+.chat-page .product-card { min-width: 0; }
+.chat-page .product-image { background: #f6f8fa; }
+.chat-page .product-card-head { flex-wrap: wrap; }
+.chat-page .product-category,
+.chat-page .article,
+.chat-page .product-name,
+.chat-page .price,
+.chat-page .analog-reason,
+.chat-page .proposal,
+.chat-page .specs dt,
+.chat-page .specs dd { overflow-wrap: anywhere; }
+.chat-page .specs { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); }
+.chat-page .specs > * { min-width: 0; }
+.chat-page .stock { white-space: normal; text-align: center; }
+.chat-page .manual-proposal { flex-wrap: wrap; }
+.chat-page .prepare-button,
+.chat-page .confirm-button { max-width: 100%; white-space: normal; }
+
+.chat-page .composer {
+  flex: 0 0 auto;
+  min-width: 0;
+  padding: 13px clamp(16px, 4vw, 56px) 7px;
+  gap: 10px;
+  background: #fff;
+  border-top: 1px solid var(--line);
+}
+.chat-page .icon-button { border-radius: 50%; background: #f3f7fa; border: 0; }
+.chat-page .composer textarea {
+  min-width: 0;
+  min-height: 43px;
+  max-height: 112px;
+  border: 0;
+  border-radius: 22px;
+  background: #f2f5f7;
+  overflow-wrap: anywhere;
+}
+.chat-page .send-button { flex: 0 0 auto; border-radius: 22px; }
+.chat-page .send-button::after { content: none; }
+.chat-page .composer-note { padding: 0 clamp(16px, 4vw, 56px) 11px; background: #fff; }
+.chat-page .attachment-preview { overflow-wrap: anywhere; }
+
+@media (max-width: 760px) {
+  .chat-page .app-shell { grid-template-rows: 56px minmax(0, 1fr); }
+  .chat-page .topbar { padding: 0 12px; gap: 8px; }
+  .chat-page .brand { font-size: 14px; }
+  .chat-page .brand-mark { flex: 0 0 32px; width: 32px; height: 32px; }
+  .chat-page .topbar-actions { gap: 10px; }
+  .chat-page .status { display: inline; font-size: 11px; white-space: nowrap; }
+  .chat-page .chat-layout { display: flex; flex-direction: column; }
+  .chat-page .sidebar { flex: 0 0 auto; padding: 8px 12px 0; overflow: visible; border-right: 0; border-bottom: 1px solid var(--line); }
+  .chat-page .sidebar .eyebrow,
+  .chat-page .sidebar h1,
+  .chat-page .sidebar > p { display: none; }
+  .chat-page .tips { display: flex; gap: 8px; margin: 0; padding: 0 0 8px; overflow-x: auto; scrollbar-width: none; }
+  .chat-page .tips::-webkit-scrollbar { display: none; }
+  .chat-page .suggestion { flex: 0 0 auto; width: auto; max-width: min(74vw, 300px); padding: 9px 12px; font-size: 12px; }
+  .chat-page .chat-panel { flex: 1 1 auto; }
+  .chat-page .conversation-header { flex-basis: 54px; padding: 7px 14px; }
+  .chat-page .conversation-avatar { flex-basis: 36px; height: 36px; }
+  .chat-page .messages { padding: 16px 12px; }
+  .chat-page .bubble { max-width: calc(100% - 42px); font-size: 14px; }
+  .chat-page .results,
+  .chat-page .proposal { width: calc(100% - 42px); margin-left: 42px; }
+  .chat-page .results { grid-template-columns: minmax(0, 1fr); }
+  .chat-page .composer { padding: 9px 10px 6px; gap: 7px; }
+  .chat-page .icon-button { flex-basis: 38px; width: 38px; height: 38px; }
+  .chat-page .send-button { height: 42px; padding: 0 12px; font-size: 13px; }
+  .chat-page .composer-note { padding: 0 12px calc(8px + env(safe-area-inset-bottom)); font-size: 10px; }
+}
+
+@media (max-width: 430px) {
+  .chat-page .brand > span:last-child { display: none; }
+  .chat-page .cart-link { font-size: 12px; }
+  .chat-page .topbar-actions { margin-left: auto; }
+  .chat-page .product-card { padding: 13px; }
+  .chat-page .product-image { margin: -13px -13px 13px; }
+  .chat-page .specs { font-size: 12px; }
+}

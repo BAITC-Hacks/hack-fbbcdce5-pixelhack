@@ -6,8 +6,9 @@
     <meta name="theme-color" content="#0b4a78" />
     <title>Электрокомплект — AI-помощник</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="chat.css" />
   </head>
-  <body>
+  <body class="chat-page">
     <main class="app-shell">
       <header class="topbar chat-topbar">
         <div class="chat-brand-row">
@@ -27,6 +28,7 @@
           <p class="sidebar-note">Товар попадёт в корзину только после вашего явного подтверждения.</p>
         </aside>
         <div class="chat-panel">
+          <div class="conversation-header"><span class="conversation-avatar" aria-hidden="true">AI</span><div><strong>Помощник EKT</strong><span>Подбор товаров и ответы по каталогу</span></div></div>
           <div id="messages" class="messages" role="log" aria-live="polite" aria-label="Сообщения чата"><article class="message assistant-message"><div class="avatar" aria-hidden="true">AI</div><div class="bubble">Здравствуйте! Напишите артикул, название товара или вопрос об условиях покупки.</div></article></div>
           <div id="attachment-preview" class="attachment-preview" hidden></div>
           <form id="chat-form" class="composer"><input id="file-input" type="file" hidden accept=".xlsx,.docx,.pdf,.jpg,.jpeg" /><label class="icon-button" for="file-input" title="Прикрепить файл"><span aria-hidden="true">+</span><span class="sr-only">Прикрепить файл</span></label><label class="sr-only" for="chat-input">Ваше сообщение</label><textarea id="chat-input" rows="1" maxlength="2000" placeholder="Например: покажи шуруповёрт"></textarea><button id="send-button" class="send-button" type="submit">Отправить</button></form>
