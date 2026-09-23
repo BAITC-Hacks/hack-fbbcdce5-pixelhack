@@ -44,6 +44,17 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(self.client.get("/api/v1/products/missing").status_code, 404)
         self.assertEqual(self.client.get("/api/v1/products?q=DEMO-C16-OLD").json()["items"][0]["id"], "demo-2")
 
+    def test_demo_drill_has_local_photo_in_chat(self):
+        product = self.client.get("/api/v1/products/demo-5").json()
+        self.assertEqual(product["article"], "DEMO-DRILL18")
+        self.assertEqual(product["image"], "/demo-drill.jpg")
+        image = self.client.get(product["image"])
+        self.assertEqual(image.status_code, 200)
+        self.assertEqual(image.headers["content-type"], "image/jpeg")
+        response = self.chat("Покажи шуруповерт")
+        self.assertEqual(response["products"][0]["image"], product["image"])
+        self.assertEqual(response["cart"]["items"], [])
+
     def test_confirmation_is_required_and_idempotent(self):
         action = self.proposal().json()["id"]
         self.assertEqual(self.client.get(self.base + "/cart", headers=self.auth).json()["items"], [])

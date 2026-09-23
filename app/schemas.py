@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl, computed_field
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, computed_field, field_validator
 
 Quantity = Annotated[Decimal, Field(gt=0, le=1000000, max_digits=12, decimal_places=3)]
 Money = Annotated[Decimal, Field(ge=0, allow_inf_nan=False)]
@@ -33,9 +33,18 @@ class Product(BaseModel):
     properties: dict[str, str | list[str]] = Field(default_factory=dict)
     certificates: list[HttpUrl] = Field(default_factory=list)
     url: HttpUrl | None = None
-    image: HttpUrl | None = None
+    image: str | None = None
     source: Literal["demo", "ekt"]
     fetched_at: datetime
+
+    @field_validator("image")
+    @classmethod
+    def validate_image(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        if value.startswith("/") and not value.startswith("//") and ".." not in value:
+            return value
+        return str(HttpUrl(value))
 
     @computed_field
     @property

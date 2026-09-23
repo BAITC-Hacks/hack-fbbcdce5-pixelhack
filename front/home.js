@@ -14,7 +14,7 @@
     const node = template.content.firstElementChild.cloneNode(true);
     const image = node.querySelector("img");
     const placeholder = node.querySelector(".image-placeholder");
-    if (product.image) { image.src = product.image; image.alt = product.name; image.hidden = false; placeholder.hidden = true; }
+    if (product.image) { image.alt = product.name; image.addEventListener("load", () => { image.hidden = false; placeholder.hidden = true; }); image.addEventListener("error", () => { image.hidden = true; placeholder.hidden = false; }); image.src = product.image; }
     node.querySelector(".store-product-category").textContent = product.category || "Электротехническое оборудование";
     node.querySelector(".store-product-name").textContent = product.name;
     node.querySelector(".store-product-article").textContent = `Артикул: ${product.article}`;
