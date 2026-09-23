@@ -37,3 +37,4 @@
   document.querySelector("#reload-products").addEventListener("click", () => loadProducts(searchInput.value.trim()));
   loadProducts();
 })();
+//gggjghjkjlgjdgdfh
