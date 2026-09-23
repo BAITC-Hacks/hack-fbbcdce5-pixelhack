@@ -33,14 +33,11 @@
   function stock(product) { if (product.quantity === null) return ["Остаток уточняется", ""]; return Number(product.quantity) > 0 ? [`В наличии: ${product.quantity}`, ""] : ["Нет в наличии", "out"]; }
   function productCard(product, reason = "") {
     const node = elements.template.content.firstElementChild.cloneNode(true); const [stockText, stockClass] = stock(product);
-    const image = node.querySelector(".product-image img");
-    const placeholder = node.querySelector(".product-image-placeholder");
+    const image = node.querySelector(".product-image img"); const placeholder = node.querySelector(".product-image-placeholder");
     if (product.image) {
       image.alt = product.name;
-      image.addEventListener("load", () => { image.hidden = false; placeholder.hidden = true; });
-      image.addEventListener("error", () => { image.hidden = true; placeholder.hidden = false; });
-      image.hidden = false;
-      placeholder.hidden = true;
+      image.addEventListener("load", () => { image.hidden = false; placeholder.hidden = true; }, { once: true });
+      image.addEventListener("error", () => { image.hidden = true; placeholder.hidden = false; }, { once: true });
       image.src = product.image;
     }
     node.querySelector(".product-category").textContent = product.category || "Категория не указана";
