@@ -57,15 +57,15 @@ class AssistantService:
         if exact:
             return exact
         # Description searches are conservative: more than one match requires clarification.
-        words = re.findall(r"[\w-]+", message.casefold())
+        words = re.findall(r"[\w-]+", message.casefold().replace("ё", "е"))
         words = [word for word in words if len(word) > 2 and word not in {
             "есть", "сколько", "осталось", "добавь", "штук", "штуки", "штуку",
             "цена", "какая", "какие", "товар", "этого", "этот", "про", "мне",
             "сертификат", "характеристики", "аналог", "аналоги", "наличии", "него",
-            "одну", "один", "два", "две", "три", "четыре", "пять",
+            "одну", "один", "два", "две", "три", "четыре", "пять", "покажи",
         }]
         matches = [p for p in products if words and all(
-            word in f"{p.name} {p.category or ''}".casefold() for word in words)]
+            word in f"{p.name} {p.category or ''}".casefold().replace("ё", "е") for word in words)]
         if matches:
             return matches
         if words:

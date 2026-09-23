@@ -33,6 +33,16 @@
   function stock(product) { if (product.quantity === null) return ["Остаток уточняется", ""]; return Number(product.quantity) > 0 ? [`В наличии: ${product.quantity}`, ""] : ["Нет в наличии", "out"]; }
   function productCard(product, reason = "") {
     const node = elements.template.content.firstElementChild.cloneNode(true); const [stockText, stockClass] = stock(product);
+    const image = node.querySelector(".product-image img");
+    const placeholder = node.querySelector(".product-image-placeholder");
+    if (product.image) {
+      image.alt = product.name;
+      image.addEventListener("load", () => { image.hidden = false; placeholder.hidden = true; });
+      image.addEventListener("error", () => { image.hidden = true; placeholder.hidden = false; });
+      image.hidden = false;
+      placeholder.hidden = true;
+      image.src = product.image;
+    }
     node.querySelector(".product-category").textContent = product.category || "Категория не указана";
     const stockNode = node.querySelector(".stock"); stockNode.textContent = stockText; if (stockClass) stockNode.classList.add(stockClass);
     node.querySelector(".product-name").textContent = product.name; node.querySelector(".article").textContent = `Артикул: ${product.article}`; node.querySelector(".price").textContent = money(product.price, product.currency);
@@ -64,6 +74,6 @@
     try { if (!session) await ensureSession(); let response; if (text) response = await request(`/sessions/${session.session_id}/chat`, { method: "POST", headers: authHeaders({ "Content-Type": "application/json" }), body: JSON.stringify({ message: text }) }); if (file) { addMessage(`Файл: ${file.name}`, "user"); response = await sendAttachment(file); elements.file.value = ""; elements.preview.hidden = true; } if (response) renderResponse(response); const demo = response?.assistant_mode === "demo"; setStatus(demo ? "Демо-режим" : "Подключено", demo ? "demo" : "online"); }
     catch (error) { addMessage(error.message); setStatus(session ? "Ошибка запроса" : "Сессия истекла — повторите запрос", "demo"); } finally { elements.send.disabled = false; }
   }
-  async function init() { try { await ensureSession(); const health = await request("/health"); let cart; try { cart = await request(`/sessions/${session.session_id}/cart`, { headers: authHeaders() }); } catch (error) { if (session) throw error; await ensureSession(); cart = await request(`/sessions/${session.session_id}/cart`, { headers: authHeaders() }); } setCart(cart); const demo = health.assistant_mode === "demo"; setStatus(demo ? "Демо-режим" : "Подключено", demo ? "demo" : "online"); elements.file.disabled = demo; document.querySelector(".composer-note").textContent = demo ? "Вложения доступны в режиме OpenAI. Не указывайте платёжные данные." : "Файлы: Excel, Word, PDF, JPEG. Не указывайте платёжные данные."; if (health.catalog_mode === "live") { const examples = document.querySelectorAll(".suggestion"); examples[0].textContent = "Покажи товар с ID 515291"; examples[1].textContent = "Какие характеристики у товара 515291?"; } } catch (error) { clearSession(); setStatus("Сервис недоступен"); addMessage(error.message); } }
+  async function init() { try { await ensureSession(); const health = await request("/health"); let cart; try { cart = await request(`/sessions/${session.session_id}/cart`, { headers: authHeaders() }); } catch (error) { if (session) throw error; await ensureSession(); cart = await request(`/sessions/${session.session_id}/cart`, { headers: authHeaders() }); } setCart(cart); const demo = health.assistant_mode === "demo"; setStatus(demo ? "Демо-режим" : "Подключено", demo ? "demo" : "online"); elements.file.disabled = demo; document.querySelector(".composer-note").textContent = demo ? "Вложения доступны в режиме OpenAI. Не указывайте платёжные данные." : "Файлы: Excel, Word, PDF, JPEG. Не указывайте платёжные данные."; if (health.catalog_mode === "live") { const examples = document.querySelectorAll(".suggestion"); examples[0].textContent = "Покажи товар с ID 515291"; examples[1].textContent = "Какие характеристики у товара 515291?"; elements.input.placeholder = "Например: покажи товар с ID 515291"; } } catch (error) { clearSession(); setStatus("Сервис недоступен"); addMessage(error.message); } }
   elements.form.addEventListener("submit", submit); elements.file.addEventListener("change", () => { const file = elements.file.files[0]; elements.preview.hidden = !file; elements.preview.textContent = file ? `Выбран файл: ${file.name}` : ""; }); document.querySelectorAll(".suggestion").forEach((button) => button.addEventListener("click", () => { elements.input.value = button.textContent; elements.input.focus(); })); init();
 })();
