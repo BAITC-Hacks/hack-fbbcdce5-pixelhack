@@ -115,6 +115,8 @@ cp .env.example .env
 
 Если `.env` уже настроен, сохраните его вместо повторного копирования шаблона.
 
+В VS Code выберите этот же интерпретатор: **Python: Select Interpreter** → `.\.venv\Scripts\python.exe`. При несовпадении Pylance сообщает `Import "fastapi"/"openai" could not be resolved`, а запуск и тесты идут без зависимостей проекта. Файл `pyrightconfig.json` в корне направляет статический анализ на `.venv`, поэтому импорты `openai` и `agents` разрешаются даже при другом выбранном интерпретаторе.
+
 ## 7. Запуск
 
 Windows:
